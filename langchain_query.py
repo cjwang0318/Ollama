@@ -45,6 +45,6 @@ if __name__ == "__main__":
     query = "連身洋裝的銷售文案"
     # Taiwan_llama(query)
     # llama2_chinese(query)
-    # mistral(query)
+    mistral(query)
 
     # https://github.com/langchain-ai/langchain/blob/master/libs/langchain/langchain/llms/ollama.py
