@@ -16,8 +16,10 @@ def convert_tw2s(str):
 
 def Taiwan_llama(query):
     Taiwan_llama_query = f"A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions. USER: {query} ASSISTANT:"
-    #ollama = Ollama(base_url="http://localhost:11434", model="Taiwan-LLaMa:7b-v2-chat")
-    ollama = Ollama(base_url="http://192.168.50.26:11434", model="Taiwan-LLaMa:7b-v2-chat")
+    # ollama = Ollama(base_url="http://localhost:11434", model="Taiwan-LLaMa:7b-v2-chat")
+    ollama = Ollama(
+        base_url="http://192.168.50.26:11434", model="Taiwan-LLaMa:7b-v2-chat"
+    )
     result = ollama(Taiwan_llama_query)
     print("Taiwan_llama:")
     print(result)
@@ -43,10 +45,18 @@ def mistral(query):
 
 
 def breeze(query):
-    mistral_query = "用中文寫1個 " + query
-    mistral_query = convert_tw2s(mistral_query)
+    mistral_query = (
+        "<s>You are a helpful AI assistant built by MediaTek Research. The user you are helping speaks Traditional Chinese and comes from Taiwan. [INST] 用中文寫1個 "
+        + query
+        + "[/INST]"
+    )
+    # mistral_query = convert_tw2s(mistral_query)
     ollama = Ollama(
-        base_url="http://192.168.50.26:11434", model="ycchen/breeze-7b-instruct-v1_0", temperature=0.8, top_k=30, repeat_penalty=1.5
+        base_url="http://192.168.50.26:11434",
+        model="ycchen/breeze-7b-instruct-v1_0",
+        temperature=0.8,
+        top_k=30,
+        repeat_penalty=1.5,
     )
     result = convert_s2tw(ollama(mistral_query))
     print("mistral:")
@@ -55,7 +65,7 @@ def breeze(query):
 
 if __name__ == "__main__":
     query = "西裝褲的標題，銷售對像是年輕人，有耐穿好穿搭的特色"
-    #Taiwan_llama(query)
+    # Taiwan_llama(query)
     breeze(query)
     # llama2_chinese(query)
     # mistral(query)
