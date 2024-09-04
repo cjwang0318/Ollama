@@ -59,15 +59,71 @@ def breeze(query):
         repeat_penalty=1.5,
     )
     result = convert_s2tw(ollama(mistral_query))
-    print("mistral:")
-    print(result)
+    # print("mistral:")
+    # print(result)
+    return result
+
+
+def taide(query):
+    system_meg = "你是一個來自台灣的AI助理，你的名字是 TAIDE，樂於以台灣人的立場幫助使用者，會用繁體中文回答問題。"
+    taide_query = (
+        f"""<|start_header_id|>system<|end_header_id|>
+        {system_meg}<|eot_id|><|start_header_id|>user<|end_header_id|>
+        {query}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
+    )
+    # print(taide_query)
+    # mistral_query = convert_tw2s(mistral_query)
+    ollama = Ollama(
+        base_url="http://192.168.50.26:11434",
+        model="cwchang/llama3-taide-lx-8b-chat-alpha1",
+        temperature=0.8,
+        top_k=30,
+        repeat_penalty=1.5,
+    )
+    result = convert_s2tw(ollama(taide_query))
+    # print("taid:")
+    # print(result)
+    return result
+
+
+def Taiwan_llama3(query):
+    system_meg = "You are an AI assistant called Twllm, created by TAME (TAiwan Mixture of Expert) project."
+    query = f"""<|start_header_id|>system<|end_header_id|>
+        {system_meg}<|eot_id|><|start_header_id|>user<|end_header_id|>
+        {query}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
+    # print(taide_query)
+    # mistral_query = convert_tw2s(mistral_query)
+    ollama = Ollama(
+        base_url="http://192.168.50.26:11434",
+        model="cwchang/llama-3-taiwan-70b-instruct",
+        temperature=0.8,
+        top_k=30,
+        repeat_penalty=1.5,
+    )
+    result = convert_s2tw(ollama(query))
+    # print("taid:")
+    # print(result)
+    return result
+
+
+def do_query(model_type, query):
+    if model_type == "S":
+        result_str = breeze(query)
+    elif model_type == "M":
+        result_str = taide(query)
+    elif model_type == "L":
+        result_str = Taiwan_llama3(query)
+    else:
+        result_str = "Please select a Model"
+    return result_str
 
 
 if __name__ == "__main__":
     query = "西裝褲的標題，銷售對像是年輕人，有耐穿好穿搭的特色"
     # Taiwan_llama(query)
-    breeze(query)
+    # breeze(query)
     # llama2_chinese(query)
     # mistral(query)
-
+    # taide(query)
+    Taiwan_llama3(query)
     # https://github.com/langchain-ai/langchain/blob/master/libs/langchain/langchain/llms/ollama.py
