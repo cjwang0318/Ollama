@@ -46,7 +46,7 @@ def mistral(query):
 
 def breeze(query):
     mistral_query = (
-        "<s>You are a helpful AI assistant built by MediaTek Research. The user you are helping speaks Traditional Chinese and comes from Taiwan. [INST] 用中文寫1個 "
+        "<s>You are a helpful AI assistant built by MediaTek Research. The user you are helping speaks Traditional Chinese and comes from Taiwan. [INST]"
         + query
         + "[/INST]"
     )
@@ -54,6 +54,26 @@ def breeze(query):
     ollama = Ollama(
         base_url="http://192.168.50.26:11434",
         model="ycchen/breeze-7b-instruct-v1_0",
+        temperature=0.8,
+        top_k=30,
+        repeat_penalty=1.5,
+    )
+    result = convert_s2tw(ollama(mistral_query))
+    # print("mistral:")
+    # print(result)
+    return result
+
+
+def breexe(query):
+    mistral_query = (
+        "<s>You are a helpful AI assistant built by MediaTek Research. The user you are helping speaks Traditional Chinese and comes from Taiwan. [INST]"
+        + query
+        + "[/INST]"
+    )
+    # mistral_query = convert_tw2s(mistral_query)
+    ollama = Ollama(
+        base_url="http://192.168.50.26:11434",
+        model="BreeXe",
         temperature=0.8,
         top_k=30,
         repeat_penalty=1.5,
@@ -86,6 +106,27 @@ def taide(query):
     return result
 
 
+def Qwen2(query):
+    query = convert_tw2s(query)
+    system_meg = "你是一个AI助理，乐于以台湾的立场帮助使用者，会用繁体中文回答问题。"
+    taide_query = f"""<|start_header_id|>system<|end_header_id|>
+        {system_meg}<|eot_id|><|start_header_id|>user<|end_header_id|>
+        {query}<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
+    #print(taide_query)
+    # mistral_query = convert_tw2s(mistral_query)
+    ollama = Ollama(
+        base_url="http://192.168.50.26:11434",
+        model="qwen2",
+        temperature=0.8,
+        top_k=30,
+        repeat_penalty=1.5,
+    )
+    result = convert_s2tw(ollama(query))
+    # print("taid:")
+    # print(result)
+    return result
+
+
 def Taiwan_llama3(query):
     system_meg = "You are an AI assistant called Twllm, created by TAME (TAiwan Mixture of Expert) project."
     query = f"""<|start_header_id|>system<|end_header_id|>
@@ -108,11 +149,11 @@ def Taiwan_llama3(query):
 
 def do_query(model_type, query):
     if model_type == "S":
-        result_str = breeze(query)
+        result_str = Qwen2(query)
     elif model_type == "M":
         result_str = taide(query)
     elif model_type == "L":
-        result_str = Taiwan_llama3(query)
+        result_str = breexe(query)
     else:
         result_str = "Please select a Model"
     return result_str
@@ -120,10 +161,14 @@ def do_query(model_type, query):
 
 if __name__ == "__main__":
     query = "西裝褲的標題，銷售對像是年輕人，有耐穿好穿搭的特色"
+    # query = "寫一個汽車銷售文案"
     # Taiwan_llama(query)
     # breeze(query)
+    result = breexe(query)
     # llama2_chinese(query)
     # mistral(query)
-    # taide(query)
-    Taiwan_llama3(query)
+    # result = taide(query)
+    # result =Taiwan_llama3(query)
+    # result=Qwen2(query)
+    print(result)
     # https://github.com/langchain-ai/langchain/blob/master/libs/langchain/langchain/llms/ollama.py
